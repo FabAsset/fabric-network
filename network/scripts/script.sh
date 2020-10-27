@@ -41,7 +41,7 @@ echo "Channel name : "$CHANNEL_NAME
 . scripts/utils.sh
 
 createChannel() {
-	setGlobals 0 0
+	setGlobals 0
 	
 	if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
                 set -x
@@ -106,14 +106,6 @@ if [ "${NO_CHAINCODE}" != "true" ]; then
 	# Instantiate chaincode on peer0.org0
 	echo "Instantiating chaincode on peer0.org0..."
 	instantiateChaincode 0 0
-
-	# Invoke chaincode on peer0.org0 and peer2.org2
-	echo "Sending invoke transaction on peer0.org0 peer2.org2..."
-	chaincodeInvoke 0 0 2 2
-
-	# Query chaincode on peer0.org0
-	echo "Querying chaincode on peer0.org0..."
-	chaincodeQuery 0 0 true
 fi
 
 echo

@@ -29,8 +29,7 @@ setOrdererGlobals() {
 }
 
 setGlobals() {
-  PEER=$1
-  ORG=$2
+  ORG=$1
   if [ $ORG -eq 0 ]; then
     CORE_PEER_LOCALMSPID="Org0MSP"
     CORE_PEER_TLS_ROOTCERT_FILE=$PEER0_ORG0_CA
@@ -58,7 +57,7 @@ setGlobals() {
 updateAnchorPeers() {
   PEER=$1
   ORG=$2
-  setGlobals $PEER $ORG
+  setGlobals $ORG
 
   if [ -z "$CORE_PEER_TLS_ENABLED" -o "$CORE_PEER_TLS_ENABLED" = "false" ]; then
     set -x
@@ -82,7 +81,7 @@ updateAnchorPeers() {
 joinChannelWithRetry() {
   PEER=$1
   ORG=$2
-  setGlobals $PEER $ORG
+  setGlobals $ORG
 
   set -x
   peer channel join -b $CHANNEL_NAME.block >&log.txt
@@ -103,7 +102,7 @@ joinChannelWithRetry() {
 installChaincode() {
   PEER=$1
   ORG=$2
-  setGlobals $PEER $ORG
+  setGlobals $ORG
   VERSION=${3:-1.0}
   set -x
   peer chaincode install -n mycc -v ${VERSION} -l ${LANGUAGE} -p ${CC_SRC_PATH} >&log.txt
@@ -118,7 +117,7 @@ installChaincode() {
 instantiateChaincode() {
   PEER=$1
   ORG=$2
-  setGlobals $PEER $ORG
+  setGlobals $ORG
   VERSION=${3:-1.0}
 
   # while 'peer chaincode' command can get the orderer endpoint from the peer
@@ -159,7 +158,7 @@ upgradeChaincode() {
 chaincodeQuery() {
   PEER=$1
   ORG=$2
-  setGlobals $PEER $ORG
+  setGlobals $ORG
   EXPECTED_RESULT=$3
   echo "===================== Querying on peer${PEER}.org${ORG} on channel '$CHANNEL_NAME'... ===================== "
   local rc=1
@@ -226,7 +225,7 @@ fetchChannelConfig() {
 signConfigtxAsPeerOrg() {
   PEERORG=$1
   TX=$2
-  setGlobals 0 $PEERORG
+  setGlobals $PEERORG
   set -x
   peer channel signconfigtx -f "${TX}"
   set +x
@@ -264,7 +263,7 @@ parsePeerConnectionParameters() {
   PEER_CONN_PARMS=""
   PEERS=""
   while [ "$#" -gt 0 ]; do
-    setGlobals $1 $2
+    setGlobals $2
     PEER="peer$1.org$2"
     PEERS="$PEERS $PEER"
     PEER_CONN_PARMS="$PEER_CONN_PARMS --peerAddresses $CORE_PEER_ADDRESS"
