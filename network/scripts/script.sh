@@ -25,15 +25,7 @@ LANGUAGE=`echo "$LANGUAGE" | tr [:upper:] [:lower:]`
 COUNTER=1
 MAX_RETRY=10
 
-CC_SRC_PATH="github.com/chaincode/chaincode_example02/go/"
-if [ "$LANGUAGE" = "node" ]; then
-	CC_SRC_PATH="/opt/gopath/src/github.com/chaincode/chaincode_example02/node/"
-fi
-
-if [ "$LANGUAGE" = "java" ]; then
-	CC_SRC_PATH="/opt/gopath/src/github.com/chaincode/signature-chaincode"
-	# CC_SRC_PATH="/opt/gopath/src/github.com/chaincode/chaincode_example02/java/"
-fi
+CC_SRC_PATH="/opt/gopath/src/github.com/chaincode/signature-chaincode"
 
 echo "Channel name : "$CHANNEL_NAME
 
