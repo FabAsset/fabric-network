@@ -1,4 +1,4 @@
-package kr.ac.postech.sslab.fabasset.chaincode;
+package com.github.fabasset.chaincode;
 
 import com.github.fabasset.chaincode.client.Address;
 import com.github.fabasset.chaincode.protocol.ERC721;

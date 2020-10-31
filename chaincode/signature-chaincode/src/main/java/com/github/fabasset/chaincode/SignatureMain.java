@@ -1,6 +1,5 @@
-package kr.ac.postech.sslab.fabasset.chaincode;
+package com.github.fabasset.chaincode;
 
-import com.github.fabasset.chaincode.Main;
 import org.hyperledger.fabric.shim.ChaincodeStub;
 import org.hyperledger.fabric.shim.ResponseUtils;
 
