@@ -13,8 +13,39 @@ public class Signature {
 
     private static final String SIGNATURES_KEY = "signatures";
 
+    private static final String FINALIZED_KEY = "finalized";
+
     @SuppressWarnings("unchecked")
-    public static boolean sign(ChaincodeStub stub, String id, String signature) throws IOException {
+    public static boolean sign(ChaincodeStub stub, String contractId, String sigId) throws IOException {
+        String caller = Address.getMyAddress(stub);
+        String owner = ERC721.ownerOf(stub, contractId);
+        if (!caller.equals(owner)) {
+            return false;
+        }
+
+        boolean isFinalized = (boolean) Extension.getXAttr(stub, contractId, FINALIZED_KEY);
+        if (isFinalized) {
+            return false;
+        }
+
+        List<String> signatures = (List<String>) Extension.getXAttr(stub, contractId, SIGNATURES_KEY);
+        List<String> signers = (List<String>) Extension.getXAttr(stub, contractId, SIGNERS_KEY);
+        if (!caller.equals(signers.get(signatures.size()))) {
+            return false;
+        }
+
+        if (!caller.equals(ERC721.ownerOf(stub, sigId))) {
+            return false;
+        }
+
+        signatures.add(sigId);
+        Extension.setXAttr(stub, contractId, SIGNATURES_KEY, signatures);
+
+        return true;
+    }
+
+    @SuppressWarnings("unchecked")
+    public static boolean finalize(ChaincodeStub stub, String id) throws IOException {
         String caller = Address.getMyAddress(stub);
         String owner = ERC721.ownerOf(stub, id);
         if (!caller.equals(owner)) {
@@ -22,36 +53,13 @@ public class Signature {
         }
 
         List<String> signers = (List<String>) Extension.getXAttr(stub, id, SIGNERS_KEY);
-
         List<String> signatures = (List<String>) Extension.getXAttr(stub, id, SIGNATURES_KEY);
-        int num_of_signatures = signatures.size();
 
-        if (isFinalized(stub, id)) {
+        if (signers.size() > signatures.size()) {
             return false;
         }
 
-        if (!caller.equals(signers.get(num_of_signatures))) {
-            return false;
-        }
-
-        if (!caller.equals(ERC721.ownerOf(stub, signature))) {
-            return false;
-        }
-
-        signatures.add(signature);
-        Extension.setXAttr(stub, id, SIGNATURES_KEY, signatures);
-
+        Extension.setXAttr(stub, id, FINALIZED_KEY, true);
         return true;
-    }
-
-    @SuppressWarnings("unchecked")
-    public static boolean isFinalized(ChaincodeStub stub, String id) throws IOException {
-        List<String> signers = (List<String>) Extension.getXAttr(stub, id, SIGNERS_KEY);
-        int num_of_signers = signers.size();
-
-        List<String> signatures = (List<String>) Extension.getXAttr(stub, id, SIGNATURES_KEY);
-        int num_of_signatures = signatures.size();
-
-        return num_of_signers <= num_of_signatures;
     }
 }
