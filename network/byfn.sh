@@ -48,7 +48,6 @@ function printHelp() {
   echo "    -l <language> - the chaincode language: golang (default) or node"
   echo "    -o <consensus-type> - the consensus-type of the ordering service: solo (default), kafka, or etcdraft"
   echo "    -i <imagetag> - the tag to be used to launch the network (defaults to \"latest\")"
-  echo "    -a - launch certificate authorities (no certificate authorities are launched by default)"
   echo "    -n - do not deploy chaincode (abstore chaincode is deployed by default)"
   echo "    -v - verbose mode"
   echo "  byfn.sh -h (print this message)"
@@ -156,12 +155,11 @@ function networkUp() {
     generateChannelArtifacts
   fi
   COMPOSE_FILES="-f ${COMPOSE_FILE}"
-  if [ "${CERTIFICATE_AUTHORITIES}" == "true" ]; then
-    COMPOSE_FILES="${COMPOSE_FILES} -f ${COMPOSE_FILE_CA}"
-    export BYFN_CA0_PRIVATE_KEY=$(cd crypto-config/peerOrganizations/org0.example.com/ca && ls *_sk)
-    export BYFN_CA1_PRIVATE_KEY=$(cd crypto-config/peerOrganizations/org1.example.com/ca && ls *_sk)
-    export BYFN_CA2_PRIVATE_KEY=$(cd crypto-config/peerOrganizations/org2.example.com/ca && ls *_sk)
-  fi
+  
+  COMPOSE_FILES="${COMPOSE_FILES} -f ${COMPOSE_FILE_CA}"
+  export BYFN_CA0_PRIVATE_KEY=$(cd crypto-config/peerOrganizations/org0.example.com/ca && ls *_sk)
+  export BYFN_CA1_PRIVATE_KEY=$(cd crypto-config/peerOrganizations/org1.example.com/ca && ls *_sk)
+  export BYFN_CA2_PRIVATE_KEY=$(cd crypto-config/peerOrganizations/org2.example.com/ca && ls *_sk)
   
   COMPOSE_FILES="${COMPOSE_FILES} -f ${COMPOSE_FILE_COUCH}"
   IMAGE_TAG=$IMAGETAG docker-compose ${COMPOSE_FILES} up -d 2>&1
@@ -435,7 +433,7 @@ if [ "$1" = "-m" ]; then # supports old usage, muscle memory is powerful!
 fi
 MODE=$1
 shift
-# Determine whether starting, stopping, restarting, generating or upgrading
+# Determine whether starting, stopping, restarting or generating
 if [ "$MODE" == "up" ]; then
   EXPMODE="Starting"
 elif [ "$MODE" == "down" ]; then
@@ -444,8 +442,6 @@ elif [ "$MODE" == "restart" ]; then
   EXPMODE="Restarting"
 elif [ "$MODE" == "generate" ]; then
   EXPMODE="Generating certs and genesis block"
-elif [ "$MODE" == "upgrade" ]; then
-  EXPMODE="Upgrading the network"
 else
   printHelp
   exit 1
@@ -477,9 +473,6 @@ while getopts "h?c:t:d:f:s:l:i:o:anv" opt; do
     ;;
   o)
     CONSENSUS_TYPE=$OPTARG
-    ;;
-  a)
-    CERTIFICATE_AUTHORITIES=true
     ;;
   n)
     NO_CHAINCODE=true
