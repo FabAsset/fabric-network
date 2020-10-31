@@ -387,4 +387,3 @@ hs_err_pid*
 .idea
 
 /chaincode/*
-!/chaincode/.gitkeep
