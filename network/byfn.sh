@@ -35,7 +35,7 @@ export VERBOSE=false
 # Print the usage message
 function printHelp() {
   echo "Usage: "
-  echo "  byfn.sh <mode> [-c <channel name>] [-t <timeout>] [-d <delay>] [-f <docker-compose-file>] [-s <dbtype>] [-l <language>] [-o <consensus-type>] [-i <imagetag>] [-a] [-n] [-v]"
+  echo "  byfn.sh <mode> [-c <channel name>] [-t <timeout>] [-d <delay>] [-f <docker-compose-file>] [-s <dbtype>] [-i <imagetag>] [-n] [-v]"
   echo "    <mode> - one of 'up', 'down', 'restart' or 'generate'"
   echo "      - 'up' - bring up the network with docker-compose up"
   echo "      - 'down' - clear the network with docker-compose down"
@@ -45,8 +45,6 @@ function printHelp() {
   echo "    -t <timeout> - CLI timeout duration in seconds (defaults to 10)"
   echo "    -d <delay> - delay duration in seconds (defaults to 3)"
   echo "    -f <docker-compose-file> - specify which docker-compose file use (defaults to docker-compose-cli.yaml)"
-  echo "    -l <language> - the chaincode language: golang (default) or node"
-  echo "    -o <consensus-type> - the consensus-type of the ordering service: solo (default), kafka, or etcdraft"
   echo "    -i <imagetag> - the tag to be used to launch the network (defaults to \"latest\")"
   echo "    -n - do not deploy chaincode (abstore chaincode is deployed by default)"
   echo "    -v - verbose mode"
@@ -402,7 +400,7 @@ else
   exit 1
 fi
 
-while getopts "h?c:t:d:f:s:l:i:o:anv" opt; do
+while getopts "h?c:t:d:f:s:i:anv" opt; do
   case "$opt" in
   h | \?)
     printHelp
@@ -420,14 +418,8 @@ while getopts "h?c:t:d:f:s:l:i:o:anv" opt; do
   f)
     COMPOSE_FILE=$OPTARG
     ;;
-  l)
-    LANGUAGE=$OPTARG
-    ;;
   i)
     IMAGETAG=$(go env GOARCH)"-"$OPTARG
-    ;;
-  o)
-    CONSENSUS_TYPE=$OPTARG
     ;;
   n)
     NO_CHAINCODE=true
